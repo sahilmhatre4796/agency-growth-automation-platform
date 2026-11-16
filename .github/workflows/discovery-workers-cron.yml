@@ -1,0 +1,108 @@
+name: Discovery Workers Cron
+
+on:
+  # schedule temporarily removed (Phase 25): no job can run automatically after
+  # push. Re-add "schedule: - cron: */5 * * * *" only at activation time —
+  # lease TTL is 3 minutes; one run per invocation, row-locked with SKIP LOCKED.
+  workflow_dispatch:
+
+jobs:
+  serper-discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger Serper discovery edge function
+        run: |
+          response=$(curl -s -w "\n%{http_code}" \
+            -X POST "https://your-project-ref.supabase.co/functions/v1/serper-discovery-jobs" \
+            -H "X-Cron-Signature: ${{ secrets.SUPABASE_CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -d "{}")
+          http_code=$(echo "$response" | tail -1)
+          body=$(echo "$response" | head -n -1)
+          echo "Serper discovery HTTP $http_code: $body"
+          case "$http_code" in
+            200) echo "Serper discovery processed a run";;
+            503) echo "Serper discovery disabled (ENABLE_SERPER_DISCOVERY off or unconfigured) — safe, no run";;
+            401) echo "Serper discovery bad signature — check SUPABASE_CRON_SECRET" >&2; exit 1;;
+            *) echo "Serper discovery unexpected status $http_code" >&2; exit 1;;
+          esac
+
+  harvey-osm-discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger Harvey OSM discovery edge function
+        run: |
+          response=$(curl -s -w "\n%{http_code}" \
+            -X POST "https://your-project-ref.supabase.co/functions/v1/harvey-osm-discovery-jobs" \
+            -H "X-Cron-Signature: ${{ secrets.SUPABASE_CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -d "{}")
+          http_code=$(echo "$response" | tail -1)
+          body=$(echo "$response" | head -n -1)
+          echo "Harvey OSM discovery HTTP $http_code: $body"
+          case "$http_code" in
+            200) echo "Harvey discovery processed a run";;
+            503) echo "Harvey discovery disabled (ENABLE_HARVEY_OSM_DISCOVERY off or unconfigured) — safe, no run";;
+            401) echo "Harvey discovery bad signature — check SUPABASE_CRON_SECRET" >&2; exit 1;;
+            *) echo "Harvey discovery unexpected status $http_code" >&2; exit 1;;
+          esac
+
+  campaign-continuation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install dependencies
+        run: npm ci
+      - name: Run campaign continuation worker
+        env:
+          # Fail-closed: flip to "true" only as an explicit activation step.
+          ENABLE_CAMPAIGN_CONTINUATION: "false"
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          INTERNAL_CRON_SECRET: ${{ secrets.SUPABASE_CRON_SECRET }}
+          CAMPAIGN_CONTINUATION_MAX_PAGES: "20"
+          CAMPAIGN_CONTINUATION_MAX_DURATION_MS: "600000"
+        run: |
+          if [ "$ENABLE_CAMPAIGN_CONTINUATION" != "true" ]; then
+            echo "ENABLE_CAMPAIGN_CONTINUATION is false — campaign continuation intentionally disabled; skipping."
+            exit 0
+          fi
+          npm run worker:campaign-continuation
+
+  intake-handoff-batch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [serper-discovery, harvey-osm-discovery]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install dependencies
+        run: npm ci
+      - name: Run intake-handoff batch worker
+        env:
+          # Fail-closed: flip to "true" only as an explicit activation step.
+          ENABLE_INTAKE_HANDOFF_BATCH: "false"
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          INTERNAL_CRON_SECRET: ${{ secrets.SUPABASE_CRON_SECRET }}
+          INTAKE_HANDOFF_BATCH_SIZE: "10"
+          INTAKE_HANDOFF_LEASE_TTL_MIN: "5"
+          INTAKE_HANDOFF_MAX_ATTEMPTS: "3"
+        run: |
+          if [ "$ENABLE_INTAKE_HANDOFF_BATCH" != "true" ]; then
+            echo "ENABLE_INTAKE_HANDOFF_BATCH is false — batch worker intentionally disabled; skipping."
+            exit 0
+          fi
+          npm run worker:intake-handoff-batch
+

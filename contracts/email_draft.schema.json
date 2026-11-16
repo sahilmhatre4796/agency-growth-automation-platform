@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EmailDraftSuggestion",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "subject",
+    "body",
+    "language",
+    "evidence_ids_used",
+    "unsupported_claims",
+    "review_required"
+  ],
+  "properties": {
+    "subject": {
+      "type": "string",
+      "maxLength": 160
+    },
+    "body": {
+      "type": "string",
+      "maxLength": 3000
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "en",
+        "hi",
+        "hinglish"
+      ]
+    },
+    "evidence_ids_used": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "uniqueItems": true
+    },
+    "unsupported_claims": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "review_required": {
+      "type": "boolean",
+      "const": true
+    }
+  }
+}

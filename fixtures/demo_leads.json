@@ -1,0 +1,26 @@
+[
+  {
+    "business_name": "Example Interiors",
+    "website_url": "https://example.com",
+    "source_type": "manual",
+    "status": "new",
+    "is_demo": true,
+    "claims": [
+      "Fictional fixture for UI and tests only"
+    ],
+    "email": "owner@example.com",
+    "consent": "unknown"
+  },
+  {
+    "business_name": "Sample Artisan Shop",
+    "website_url": "https://example.org",
+    "source_type": "inbound",
+    "status": "qualified",
+    "is_demo": true,
+    "claims": [
+      "Fictional inbound request to test filtering"
+    ],
+    "email": "sales@example.org",
+    "consent": "opted_in"
+  }
+]

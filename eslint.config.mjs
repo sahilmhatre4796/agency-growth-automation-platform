@@ -1,0 +1,27 @@
+import js from "@eslint/js";
+import tseslint from "typescript-eslint";
+import hooks from "eslint-plugin-react-hooks";
+const config = [
+  {
+    ignores: [
+      "**/.next/**",
+      "**/out/**",
+      "**/node_modules/**",
+      "**/next-env.d.ts",
+      "CHATGPT_PROJECT_HANDOFF/**",
+      ".tools/**",
+    ],
+  },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    files: ["**/*.{ts,tsx}"],
+    plugins: { "react-hooks": hooks },
+    rules: hooks.configs.recommended.rules,
+  },
+  {
+    files: ["scripts/*.mjs"],
+    languageOptions: { globals: { console: "readonly" } },
+  },
+];
+export default config;

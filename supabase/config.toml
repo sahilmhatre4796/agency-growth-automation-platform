@@ -1,0 +1,48 @@
+project_id = "chaincraft-local"
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+[db]
+port = 54322
+major_version = 17
+[studio]
+enabled = true
+port = 54323
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:3000"
+additional_redirect_urls = []
+enable_signup = false
+
+# Each public callback verifies its own OAuth state or Meta HMAC before accepting data.
+# Secrets/configuration are absent by default; these functions fail closed.
+[functions.google-oauth]
+verify_jwt = false
+[functions.whatsapp-webhook]
+verify_jwt = false
+
+# Service cron handlers authenticate with INTERNAL_CRON_SECRET in X-Cron-Signature.
+# Live execution is also blocked by their ENABLE_* flags until explicitly approved.
+[functions.gmail-jobs]
+verify_jwt = false
+[functions.gmail-backlog]
+verify_jwt = false
+[functions.gmail-sync]
+verify_jwt = false
+[functions.gmail-sequences]
+verify_jwt = false
+[functions.email-verification-jobs]
+verify_jwt = false
+[functions.business-research-jobs]
+verify_jwt = false
+[functions.serper-discovery-jobs]
+verify_jwt = false
+[functions.harvey-osm-discovery-jobs]
+verify_jwt = false
+[functions.vibe-contact-discovery-jobs]
+verify_jwt = false
+[functions.research-preview-jobs]
+verify_jwt = false

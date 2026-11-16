@@ -1,0 +1,3 @@
+# Copy after owner reviews M0/M1/etc.
+
+Continue the ChainCraft Sales Command Center from the current checked-in state. Read AGENTS.md, PROJECT_STATUS.md and TASKS.md. Implement **only** the next incomplete milestone in BUILD_PLAN.md, with a short plan and tests. Keep external sending disabled, no paid services and no live phone calling. Only implement optional M8 when the owner explicitly requests it; all voice flags remain OFF by default. Reconcile acceptance criteria with actual code and update CHANGELOG, TASKS, PROJECT_STATUS and DECISIONS. Report verified completion, unresolved issues and explicit owner approvals needed for any external integrations.

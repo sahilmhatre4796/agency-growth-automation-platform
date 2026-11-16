@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
+    "types": ["node"],
+    "paths": {
+      "npm:zod@4.6.7": ["./node_modules/zod/index.d.ts"],
+      "npm:@supabase/supabase-js@2.118.0": [
+        "./node_modules/@supabase/supabase-js/dist/index.d.mts"
+      ]
+    }
+  },
+  "include": [
+    "supabase/functions/**/*.ts",
+    "supabase/edge-runtime.d.ts",
+    "packages/**/*.ts"
+  ],
+  "exclude": ["packages/server/node-audit-transport.ts"]
+}

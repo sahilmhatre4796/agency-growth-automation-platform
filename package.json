@@ -1,0 +1,49 @@
+{
+  "name": "agency-growth-automation-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered agency growth platform: international lead discovery, qualification, CRM, website research and campaign orchestration",
+  "scripts": {
+    "dev": "next dev apps/web --webpack --hostname 127.0.0.1",
+    "build": "next build apps/web --webpack",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p apps/web/tsconfig.json && tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.edge.json",
+    "test": "vitest run",
+    "format": "prettier --write .",
+    "db:types": "node scripts/generate-db-types.mjs",
+    "worker:website-audit": "node --experimental-transform-types scripts/website-audit-worker.ts",
+    "worker:intake-handoff": "node --experimental-transform-types scripts/intake-handoff-worker.ts",
+    "worker:intake-handoff-batch": "node --experimental-transform-types scripts/intake-handoff-batch-worker.ts",
+    "reconcile:intake-handoff-queue": "node --experimental-transform-types scripts/intake-handoff-reconcile.ts",
+    "worker:discovery": "node --experimental-transform-types scripts/discovery-worker.ts",
+    "worker:campaign-continuation": "node --experimental-transform-types scripts/campaign-continuation-worker.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
+    "lucide-react": "^1.59.0",
+    "next": "^16.4.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.10",
+    "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.64.1",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "jsdom": "^30.1.3",
+    "prettier": "^3.9.10",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.2",
+    "vitest": "^5.0.5"
+  },
+  "type": "module"
+}
